@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Arbitrage 🦫"/>
+<title>Arbitrage Castor</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;background:#F2F2F7;min-height:100vh;padding-bottom:40px}
+  .header{background:#1C1C1E;padding:60px 20px 16px}
+  .header-top{display:flex;justify-content:space-between;align-items:flex-end}
+  .header-sub{font-size:11px;color:#636366;font-weight:600;letter-spacing:.3px;text-transform:uppercase;margin-bottom:2px}
+  .header-title{font-size:26px;font-weight:800;color:#fff;letter-spacing:-.5px}
+  .capacity-badge{background:#007AFF22;border:1px solid #007AFF44;border-radius:10px;padding:6px 12px;text-align:right}
+  .capacity-label{font-size:9px;color:#636366;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+  .capacity-val{font-size:16px;font-weight:800;color:#007AFF;font-variant-numeric:tabular-nums}
+  .body{padding:16px}
+  .decision{border-radius:18px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .decision.win{background:linear-gradient(135deg,#34C759,#30D158);box-shadow:0 4px 20px #34C75940}
+  .decision.lose{background:linear-gradient(135deg,#FF3B30,#FF453A);box-shadow:0 4px 20px #FF3B3040}
+  .dec-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.5px}
+  .dec-val{font-size:26px;font-weight:900;color:#fff;letter-spacing:-.5px}
+  .dec-right{text-align:right}
+  .dec-gain{font-size:24px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
+  .dec-pct{font-size:12px;font-weight:700;color:rgba(255,255,255,.8)}
+  .section-title{font-size:11px;font-weight:700;color:#8E8E93;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;padding-left:4px}
+  .fields{display:flex;flex-direction:column;gap:2px;border-radius:16px;overflow:hidden;margin-bottom:16px}
+  .field{background:#fff;padding:12px 16px;display:flex;flex-direction:column;gap:4px;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+  .field-label{font-size:11px;font-weight:600;color:#8E8E93;letter-spacing:.3px;text-transform:uppercase}
+  .field-row{display:flex;align-items:center;gap:6px}
+  .field input{flex:1;border:none;outline:none;font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;background:transparent;min-width:0;color:inherit}
+  .field-suffix{font-size:18px;font-weight:600;opacity:.6}
+  .card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:16px}
+  .card.highlight-win{border:2px solid #34C759;box-shadow:0 4px 20px #34C75920}
+  .card.highlight-lose{border:2px solid #FF3B30;box-shadow:0 4px 20px #FF3B3020}
+  .badges{display:flex;gap:8px;margin-bottom:4px}
+  .badge{flex:1;border-radius:10px;padding:8px 10px;text-align:center}
+  .badge-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+  .badge-val{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+  .progress-bar{height:6px;background:#E5E5EA;border-radius:3px;overflow:hidden;margin-top:10px}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#007AFF,#5856D6);border-radius:3px;transition:width .4s ease}
+  .progress-label{font-size:10px;color:#8E8E93;margin-top:4px;text-align:right}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #F2F2F7}
+  .row-label{font-size:13px;color:#3C3C43;display:flex;align-items:center;gap:6px}
+  .row-val{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+  .result-box{background:#F2F2F7;border-radius:12px;padding:12px;text-align:center;margin-top:10px}
+  .result-box.win{background:linear-gradient(135deg,#34C759,#30D158)}
+  .result-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+  .result-val{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums}
+  .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .card-stitle{font-size:11px;font-weight:700;color:#8E8E93;letter-spacing:.5px;text-transform:uppercase;display:flex;align-items:center;gap:5px}
+  .optimal-badge{font-size:9px;font-weight:800;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
+  .info-row{display:flex;justify-content:space-between;align-items:center;background:#F2F2F7;border-radius:10px;padding:8px 12px}
+  .info-label{font-size:11px;color:#636366;font-weight:600}
+  .info-val{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+  .info-rows{display:flex;flex-direction:column;gap:6px;margin-top:10px;margin-bottom:10px}
+  .bareme-row{display:flex;justify-content:space-between;align-items:center;border-radius:10px;padding:8px 12px;margin-bottom:6px}
+  .bareme-label{font-size:12px;color:#3C3C43;font-weight:500}
+  .bareme-taux{font-size:14px;font-weight:800}
+  .note{font-size:11px;color:#8E8E93;margin-top:10px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-sub">🦫 Arbitrage Castor</div>
+      <div class="header-title">Recyclage Brut</div>
+    </div>
+    <div class="capacity-badge">
+      <div class="capacity-label">Capacité 25%</div>
+      <div class="capacity-val" id="plafond">0 €</div>
+    </div>
+  </div>
+</div>
+
+<div class="body">
+  <div class="decision" id="decisionBox">
+    <div>
+      <div class="dec-label">Décision</div>
+      <div class="dec-val" id="decisionText">—</div>
+    </div>
+    <div class="dec-right">
+      <div class="dec-label">Gain net</div>
+      <div class="dec-gain" id="gainNet">0,00 €</div>
+      <div class="dec-pct" id="gainPct">0,00 %</div>
+    </div>
+  </div>
+
+  <div class="section-title">Paramètres</div>
+  <div class="fields">
+    <div class="field">
+      <div class="field-label">Salaire brut annuel</div>
+      <div class="field-row" style="color:#5856D6">
+        <input type="number" id="brutAnnuel" value="32000" inputmode="decimal"/>
+        <span class="field-suffix" style="color:#5856D699">€</span>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">Participation brute</div>
+      <div class="field-row" style="color:#007AFF">
+        <input type="number" id="participationBrute" value="1238" inputmode="decimal"/>
+        <span class="field-suffix" style="color:#007AFF99">€</span>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">Déjà versé au PEG cette année</div>
+      <div class="field-row" style="color:#FF9500">
+        <input type="number" id="dejaVerse" value="0" inputmode="decimal"/>
+        <span class="field-suffix" style="color:#FF950099">€</span>
+      </div>
+    </div>
+    <div class="field">
+      <div class="field-label">Tranche marginale d'imposition</div>
+      <div class="field-row" style="color:#FF3B30">
+        <input type="number" id="tmi" value="11" inputmode="decimal"/>
+        <span class="field-suffix" style="color:#FF3B3099">%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Enveloppe abondement</div>
+  <div class="card">
+    <div class="badges">
+      <div class="badge" style="background:#8E8E9312">
+        <div class="badge-label" style="color:#8E8E93">Acquis</div>
+        <div class="badge-val" style="color:#8E8E93" id="badgeAcquis">0,00 €</div>
+      </div>
+      <div class="badge" style="background:#007AFF12">
+        <div class="badge-label" style="color:#007AFF">Disponible</div>
+        <div class="badge-val" style="color:#007AFF" id="badgeDisponible">0,00 €</div>
+      </div>
+      <div class="badge" style="background:#5856D612">
+        <div class="badge-label" style="color:#5856D6">Plafond</div>
+        <div class="badge-val" style="color:#5856D6">3 500 €</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-label" id="progressLabel">0,0 % consommé</div>
+  </div>
+
+  <div class="section-title">Comparaison des scénarios</div>
+  <div class="card" style="opacity:.8;margin-bottom:8px">
+    <div class="card-stitle">🔒 Option A — Bloquer</div>
+    <div class="row"><span class="row-label">Abondement généré</span><span class="row-val">0,00 €</span></div>
+    <div class="row"><span class="row-label">Impôt sur le revenu</span><span class="row-val" style="color:#34C759">Exonéré</span></div>
+    <div class="result-box">
+      <div class="result-label" style="color:#8E8E93">Valeur nette</div>
+      <div class="result-val" style="color:#1C1C1E" id="scenarioA">0,00 €</div>
+    </div>
+  </div>
+
+  <div class="card" id="scenarioBCard">
+    <div class="card-header">
+      <div class="card-stitle">♻️ Option B — Recycler</div>
+      <span class="optimal-badge" id="optimalBadge">—</span>
+    </div>
+    <div class="row"><span class="row-label">📈 Abondement généré</span><span class="row-val" style="color:#34C759" id="abondementGagne">+0,00 €</span></div>
+    <div class="row"><span class="row-label">🧾 Dette fiscale (IR différé)</span><span class="row-val" style="color:#FF3B30" id="detteFiscale">-0,00 €</span></div>
+    <div class="row"><span class="row-label">% Performance nette</span><span class="row-val" id="perfNette">0,00 %</span></div>
+    <div class="info-rows">
+      <div class="info-row">
+        <span class="info-label">⏳ Reliquat abondement</span>
+        <span class="info-val" style="color:#007AFF" id="reliquat">0,00 €</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">🎯 Complément pour saturer</span>
+        <span class="info-val" style="color:#FF9500" id="complement">0,00 €</span>
+      </div>
+    </div>
+    <div class="result-box" id="resultBoxB">
+      <div class="result-label" id="resultLabelB" style="color:#8E8E93">Bilan net</div>
+      <div class="result-val" id="scenarioB" style="color:#1C1C1E">0,00 €</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-stitle" style="margin-bottom:10px">ℹ️ Barème abondement</div>
+    <div class="bareme-row" style="background:#5856D610">
+      <span class="bareme-label">Tranche 1 : 0 → 500 €</span>
+      <span class="bareme-taux" style="color:#5856D6">200 %</span>
+    </div>
+    <div class="bareme-row" style="background:#007AFF10">
+      <span class="bareme-label">Tranche 2 : 500 → 2 000 €</span>
+      <span class="bareme-taux" style="color:#007AFF">100 %</span>
+    </div>
+    <div class="bareme-row" style="background:#34C75910">
+      <span class="bareme-label">Tranche 3 : 2 000 → 4 000 €</span>
+      <span class="bareme-taux" style="color:#34C759">50 %</span>
+    </div>
+    <p class="note">Le recyclage brut suppose le réinvestissement à 100% de la prime. L'impôt sur le revenu est une dette fiscale différée. L'abondement est acquis immédiatement sur le versement total.</p>
+  </div>
+</div>
+
+<script>
+const sf = (n,d=2) => (n||0).toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});
+
+function calcAbondement(montant){
+  let a=0;
+  const v=Math.min(montant,4000);
+  a+=Math.min(v,500)*2;
+  if(v>500) a+=(Math.min(v,2000)-500)*1;
+  if(v>2000) a+=(Math.min(v,4000)-2000)*0.5;
+  return a;
+}
+
+function update(){
+  const brut=parseFloat(document.getElementById('brutAnnuel').value)||0;
+  const part=parseFloat(document.getElementById('participationBrute').value)||0;
+  const deja=parseFloat(document.getElementById('dejaVerse').value)||0;
+  const tmi=parseFloat(document.getElementById('tmi').value)||0;
+  const plafond=brut*0.25;
+  document.getElementById('plafond').textContent=sf(plafond,0)+' €';
+  const abAvant=calcAbondement(deja);
+  const abRestant=3500-abAvant;
+  const versement=Math.max(0,Math.min(part,plafond-deja));
+  const abApres=calcAbondement(deja+versement);
+  const gainAb=abApres-abAvant;
+  const ir=part*(tmi/100);
+  const totalA=part;
+  const totalB=part+gainAb-ir;
+  const diff=totalB-totalA;
+  const pct=part>0?(diff/part)*100:0;
+  const win=diff>0;
+  document.getElementById('badgeAcquis').textContent=sf(abAvant)+' €';
+  document.getElementById('badgeDisponible').textContent=sf(abRestant)+' €';
+  const pctBar=Math.min(100,(abAvant/3500)*100);
+  document.getElementById('progressFill').style.width=pctBar+'%';
+  document.getElementById('progressLabel').textContent=pctBar.toFixed(1)+' % consommé';
+  const db=document.getElementById('decisionBox');
+  db.className='decision '+(win?'win':'lose');
+  document.getElementById('decisionText').textContent=win?'RECYCLER ✓':'BLOQUER ✗';
+  document.getElementById('gainNet').textContent=(diff>0?'+':'')+sf(diff)+' €';
+  document.getElementById('gainPct').textContent=(pct>0?'+':'')+pct.toFixed(2)+' %';
+  document.getElementById('scenarioA').textContent=sf(totalA)+' €';
+  document.getElementById('abondementGagne').textContent='+'+sf(gainAb)+' €';
+  document.getElementById('detteFiscale').textContent='-'+sf(ir)+' €';
+  const pn=document.getElementById('perfNette');
+  pn.textContent=(pct>0?'+':'')+pct.toFixed(2)+' %';
+  pn.style.color=win?'#34C759':'#FF3B30';
+  document.getElementById('reliquat').textContent=sf(Math.max(0,3500-abApres))+' €';
+  document.getElementById('complement').textContent=sf(Math.max(0,4000-(deja+versement)))+' €';
+  document.getElementById('scenarioB').textContent=sf(totalB)+' €';
+  const bc=document.getElementById('scenarioBCard');
+  bc.className='card '+(win?'highlight-win':'highlight-lose');
+  const ob=document.getElementById('optimalBadge');
+  ob.textContent=win?'OPTIMAL':'PERTE';
+  ob.style.color=win?'#34C759':'#FF3B30';
+  ob.style.background=win?'#34C75915':'#FF3B3015';
+  const rb=document.getElementById('resultBoxB');
+  rb.className='result-box '+(win?'win':'');
+  document.getElementById('resultLabelB').style.color=win?'rgba(255,255,255,.7)':'#8E8E93';
+  document.getElementById('scenarioB').style.color=win?'#fff':'#1C1C1E';
+}
+
+document.querySelectorAll('input').forEach(i=>i.addEventListener('input',update));
+update();
+</script>
+
+</body>
+</html>
